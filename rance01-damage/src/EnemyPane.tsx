@@ -55,7 +55,7 @@ export const EnemyPane = () => {
             name="honeyFlash"
             id="honeyFlash"
             checked={honeyFlash}
-            onClick={handleHoneyFlashClicked}
+            onChange={handleHoneyFlashClicked}
           />
         </label>
       </div>

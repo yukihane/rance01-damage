@@ -42,7 +42,7 @@ export const PlayerPane = () => {
             name="oneShot"
             id="oneShot"
             checked={oneShot}
-            onClick={handleOneShotClicked}
+            onChange={handleOneShotClicked}
           />
         </label>
       </div>

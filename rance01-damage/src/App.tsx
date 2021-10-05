@@ -1,7 +1,6 @@
 import { CommonPane } from "./CommonPane";
 import { EnemyPane } from "./EnemyPane";
 import { PlayerPane } from "./PlayerPane";
-import logo from "./logo.svg";
 
 export const App = () => {
   return (

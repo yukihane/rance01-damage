@@ -1,3 +1,31 @@
+import { ChangeEvent } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { PLAYER_CHIPS_LENGTH, setPlayerChip } from "./playerSlice";
+import { RootState } from "./store";
+
 export const PlayerPane = () => {
-  return <div>player pane</div>;
+  const chips = useSelector((state: RootState) => state.player.chips);
+  const dispatch = useDispatch();
+
+  const handleChipChanged = (e: ChangeEvent<HTMLInputElement>, row: number) => {
+    dispatch(setPlayerChip({ row, value: e.target.value }));
+  };
+
+  const chipRow = Array(PLAYER_CHIPS_LENGTH)
+    .fill(0)
+    .map((_, i) => (
+      <div key={i}>
+        <label>
+          {i}
+          <input
+            type="text"
+            name={"playerChips" + i}
+            id={"playerChips" + i}
+            value={chips[i]}
+            onChange={(e) => handleChipChanged(e, i)}
+          />
+        </label>
+      </div>
+    ));
+  return <>{chipRow}</>;
 };

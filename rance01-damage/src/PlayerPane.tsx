@@ -1,14 +1,18 @@
 import { ChangeEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { PLAYER_CHIPS_LENGTH, setPlayerChip } from "./playerSlice";
+import { PLAYER_CHIPS_LENGTH, setOneShot, setPlayerChip } from "./playerSlice";
 import { RootState } from "./store";
 
 export const PlayerPane = () => {
-  const chips = useSelector((state: RootState) => state.player.chips);
+  const { chips, oneShot } = useSelector((state: RootState) => state.player);
   const dispatch = useDispatch();
 
   const handleChipChanged = (e: ChangeEvent<HTMLInputElement>, row: number) => {
     dispatch(setPlayerChip({ row, value: e.target.value }));
+  };
+
+  const handleOneShotClicked = () => {
+    dispatch(setOneShot({ oneShot: !oneShot }));
   };
 
   const chipRow = Array(PLAYER_CHIPS_LENGTH)
@@ -27,5 +31,21 @@ export const PlayerPane = () => {
         </label>
       </div>
     ));
-  return <>{chipRow}</>;
+  return (
+    <>
+      <div>{chipRow}</div>
+      <div>
+        <label>
+          一発屋
+          <input
+            type="checkbox"
+            name="oneShot"
+            id="oneShot"
+            checked={oneShot}
+            onClick={handleOneShotClicked}
+          />
+        </label>
+      </div>
+    </>
+  );
 };

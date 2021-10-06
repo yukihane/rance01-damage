@@ -10,6 +10,7 @@ export const PlayerPane = () => {
 
   const handleChipChanged = (e: ChangeEvent<HTMLInputElement>, row: number) => {
     dispatch(setPlayerChip({ row, value: e.target.value }));
+    dispatch(calculateDamege());
   };
 
   const handleOneShotClicked = () => {

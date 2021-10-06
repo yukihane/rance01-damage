@@ -1,10 +1,11 @@
 import { FC } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "./store";
+import { Damage } from "./types";
 
 type Props = {
   title: string;
-  value: { min: number; max: number };
+  value: Damage;
 };
 
 export const ResultPane: FC<Props> = ({ title, value }) => {

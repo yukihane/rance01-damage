@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { invoke } from "@tauri-apps/api";
 import { RootState } from "./store";
+import { Damage } from "./types";
 
 type Param = {
   common: {
@@ -15,11 +16,6 @@ type Param = {
     defense: string;
     honeyFlash: boolean;
   };
-};
-
-type Damage = {
-  min: number;
-  max: number;
 };
 
 type Result = {

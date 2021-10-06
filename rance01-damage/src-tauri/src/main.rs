@@ -49,7 +49,7 @@ struct Response {
 }
 
 #[tauri::command]
-fn calculate_damege(param: Param) -> Response {
+fn calculate_damage(param: Param) -> Response {
   println!("param: {:?}", param);
   Response {
     player_damage: Damage { min: 10, max: 20 },
@@ -59,7 +59,7 @@ fn calculate_damege(param: Param) -> Response {
 
 fn main() {
   tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![calculate_damege])
+    .invoke_handler(tauri::generate_handler![calculate_damage])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }

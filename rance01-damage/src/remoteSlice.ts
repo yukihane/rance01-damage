@@ -19,7 +19,7 @@ type Param = {
 };
 
 type Result = {
-  playerDamege: Damage;
+  playerDamage: Damage;
   enemyDamage: Damage;
 };
 
@@ -30,21 +30,21 @@ const getRandomInt = (min: number, max: number): number => {
   return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 };
 
-export const calculateDamege = createAsyncThunk<
+export const calculateDamage = createAsyncThunk<
   Result,
   void,
   { state: RootState }
->("remote/calculateDamege", async (_: void, { getState }) => {
+>("remote/calculateDamage", async (_: void, { getState }) => {
   const param: Param = getState();
 
-  return invoke<Result>("calculate_damege", { param });
+  return invoke<Result>("calculate_damage", { param });
   // console.log(state.player.oneShot);
   // return new Promise<Result>((resolve, reject) => {
   //   const player = getRandomInt(0, 100);
   //   const enemy = getRandomInt(5, 1000);
   //   console.log("resolve");
   //   resolve({
-  //     playerDamege: { min: player, max: player + 10 },
+  //     playerDamage: { min: player, max: player + 10 },
   //     enemyDamage: { min: enemy, max: enemy + 50 },
   //   });
   // });
@@ -55,7 +55,7 @@ interface RemoteState {
 }
 
 const initialState: RemoteState = {
-  result: { playerDamege: { min: 0, max: 0 }, enemyDamage: { min: 0, max: 0 } },
+  result: { playerDamage: { min: 0, max: 0 }, enemyDamage: { min: 0, max: 0 } },
 };
 
 const remoteSlice = createSlice({
@@ -63,7 +63,7 @@ const remoteSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(calculateDamege.fulfilled, (state, action) => {
+    builder.addCase(calculateDamage.fulfilled, (state, action) => {
       console.log("fullfilled");
       state.result = action.payload;
     });

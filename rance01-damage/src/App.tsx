@@ -6,7 +6,7 @@ import { ResultPane } from "./ResultPane";
 import { RootState } from "./store";
 
 export const App = () => {
-  const { playerDamege, enemyDamage } = useSelector(
+  const { playerDamage, enemyDamage } = useSelector(
     (state: RootState) => state.remote.result
   );
 
@@ -22,7 +22,7 @@ export const App = () => {
         <EnemyPane />
       </div>
       <div id="playerDamagePane">
-        <ResultPane title="プレーヤー" value={playerDamege} />
+        <ResultPane title="プレーヤー" value={playerDamage} />
       </div>
       <div id="enemyDamagePane">
         <ResultPane title="敵" value={enemyDamage} />

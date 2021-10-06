@@ -10,7 +10,7 @@ type Props = {
 
 export const ResultPane: FC<Props> = ({ title, value }) => {
   const damage = useSelector(
-    (state: RootState) => state.remote.result.playerDamege
+    (state: RootState) => state.remote.result.playerDamage
   );
 
   return (

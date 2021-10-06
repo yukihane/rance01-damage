@@ -1,7 +1,7 @@
 import { ChangeEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setEnemyAttack, setEnemyDefense, setHoneyFlash } from "./enemySlice";
-import { calculateDamege } from "./remoteSlice";
+import { calculateDamage } from "./remoteSlice";
 import { RootState } from "./store";
 
 export const EnemyPane = () => {
@@ -12,17 +12,17 @@ export const EnemyPane = () => {
 
   const handleAttackChanged = (e: ChangeEvent<HTMLInputElement>) => {
     dispatch(setEnemyAttack({ value: e.target.value }));
-    dispatch(calculateDamege());
+    dispatch(calculateDamage());
   };
 
   const handleDefenseChanged = (e: ChangeEvent<HTMLInputElement>) => {
     dispatch(setEnemyDefense({ value: e.target.value }));
-    dispatch(calculateDamege());
+    dispatch(calculateDamage());
   };
 
   const handleHoneyFlashClicked = () => {
     dispatch(setHoneyFlash({ value: !honeyFlash }));
-    dispatch(calculateDamege());
+    dispatch(calculateDamage());
   };
 
   return (

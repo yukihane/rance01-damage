@@ -1,7 +1,7 @@
 import { ChangeEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setTurn } from "./commonSlice";
-import { calculateDamege } from "./remoteSlice";
+import { calculateDamage } from "./remoteSlice";
 import { RootState } from "./store";
 
 export const CommonPane = () => {
@@ -11,7 +11,7 @@ export const CommonPane = () => {
   const handleTurnChanged = (e: ChangeEvent<HTMLInputElement>) => {
     const turn = parseInt(e.target.value);
     dispatch(setTurn(turn));
-    dispatch(calculateDamege());
+    dispatch(calculateDamage());
   };
 
   return (

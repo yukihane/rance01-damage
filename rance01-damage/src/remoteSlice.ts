@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { invoke } from "@tauri-apps/api";
+import { RootState } from "./store";
 
 type Param = {
   common: {
@@ -33,20 +34,24 @@ const getRandomInt = (min: number, max: number): number => {
   return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 };
 
-export const calculateDamege = createAsyncThunk(
-  "remote/calculateDamege",
-  async (param: Param) => {
-    //    return await invoke<Result>("calculate_damege", { param });
-    return await new Promise<Result>((resolve, reject) => {
-      const player = getRandomInt(0, 100);
-      const enemy = getRandomInt(5, 1000);
-      resolve({
-        playerDamege: { min: player, max: player + 10 },
-        enemyDamage: { min: enemy, max: enemy + 50 },
-      });
+export const calculateDamege = createAsyncThunk<
+  Result,
+  void,
+  { state: RootState }
+>("remote/calculateDamege", async (_: void, { getState }) => {
+  const state = getState();
+  //   return await invoke<Result>("calculate_damege", { param });
+  console.log(state.player.oneShot);
+  return new Promise<Result>((resolve, reject) => {
+    const player = getRandomInt(0, 100);
+    const enemy = getRandomInt(5, 1000);
+    console.log("resolve");
+    resolve({
+      playerDamege: { min: player, max: player + 10 },
+      enemyDamage: { min: enemy, max: enemy + 50 },
     });
-  }
-);
+  });
+});
 
 interface RemoteState {
   result: Result;
@@ -62,6 +67,7 @@ const remoteSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(calculateDamege.fulfilled, (state, action) => {
+      console.log("fullfilled");
       state.result = action.payload;
     });
   },

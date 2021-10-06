@@ -1,6 +1,7 @@
 import { ChangeEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { PLAYER_CHIPS_LENGTH, setOneShot, setPlayerChip } from "./playerSlice";
+import { calculateDamege } from "./remoteSlice";
 import { RootState } from "./store";
 
 export const PlayerPane = () => {
@@ -13,6 +14,7 @@ export const PlayerPane = () => {
 
   const handleOneShotClicked = () => {
     dispatch(setOneShot({ oneShot: !oneShot }));
+    dispatch(calculateDamege());
   };
 
   const chipRow = Array(PLAYER_CHIPS_LENGTH)

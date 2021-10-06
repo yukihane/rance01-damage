@@ -12,7 +12,7 @@ type Param = {
     oneShot: boolean;
   };
   enemy: {
-    atack: string;
+    attack: string;
     defense: string;
     honeyFlash: boolean;
   };
@@ -35,18 +35,19 @@ export const calculateDamege = createAsyncThunk<
   void,
   { state: RootState }
 >("remote/calculateDamege", async (_: void, { getState }) => {
-  const state = getState();
-  //   return await invoke<Result>("calculate_damege", { param });
-  console.log(state.player.oneShot);
-  return new Promise<Result>((resolve, reject) => {
-    const player = getRandomInt(0, 100);
-    const enemy = getRandomInt(5, 1000);
-    console.log("resolve");
-    resolve({
-      playerDamege: { min: player, max: player + 10 },
-      enemyDamage: { min: enemy, max: enemy + 50 },
-    });
-  });
+  const param: Param = getState();
+
+  return invoke<Result>("calculate_damege", { param });
+  // console.log(state.player.oneShot);
+  // return new Promise<Result>((resolve, reject) => {
+  //   const player = getRandomInt(0, 100);
+  //   const enemy = getRandomInt(5, 1000);
+  //   console.log("resolve");
+  //   resolve({
+  //     playerDamege: { min: player, max: player + 10 },
+  //     enemyDamage: { min: enemy, max: enemy + 50 },
+  //   });
+  // });
 });
 
 interface RemoteState {

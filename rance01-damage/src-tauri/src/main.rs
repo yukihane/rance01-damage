@@ -5,6 +5,9 @@
 
 use serde::{Deserialize, Serialize};
 
+use lazy_static::lazy_static;
+use regex::Regex;
+
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 struct Common {
@@ -14,7 +17,7 @@ struct Common {
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 struct Player {
-  chips: [String; 10],
+  chips: Vec<String>,
   one_shot: bool,
 }
 
@@ -48,13 +51,35 @@ struct Response {
   enemy_damage: Damage,
 }
 
+struct Total {
+  attack: i32,
+  defense: i32,
+}
+
+fn calcurate_damage_internal(param: &Param) -> std::result::Result<Response, std::io::Error> {
+  let re = Regex::new(r"(a|d)?(\d+)(w)?")?;
+}
+
 #[tauri::command]
-fn calculate_damage(param: Param) -> Response {
+fn calculate_damage(param: Param) /*-> Response*/
+{
   println!("param: {:?}", param);
-  Response {
-    player_damage: Damage { min: 10, max: 20 },
-    enemy_damage: Damage { min: 30, max: 40 },
-  }
+
+  let response = calcurate_damage_internal(&param);
+
+  let re = Regex::new(r"(a|d)?(\d+)(w)?").unwrap();
+
+  // const res = RE.is_match("a10w");
+
+  // let iter = param.player.chips.iter().map(|x| {
+  //   if x.contains("d") {
+  //   } else {
+  //   }
+  // });
+  // Response {
+  //   player_damage: Damage { min: 10, max: 20 },
+  //   enemy_damage: Damage { min: 30, max: 40 },
+  // }
 }
 
 fn main() {

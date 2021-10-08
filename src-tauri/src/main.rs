@@ -3,9 +3,10 @@
   windows_subsystem = "windows"
 )]
 
-use serde::{Deserialize, Serialize};
-
+use anyhow::{Context as _, Result};
 use regex::Regex;
+use serde::{Deserialize, Serialize};
+use std::error::Error;
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -55,8 +56,21 @@ struct Total {
   defense: i32,
 }
 
-fn calcurate_damage_internal(param: &Param) -> std::result::Result<Response, std::io::Error> {
-  let re = Regex::new(r"(a|d)?(\d+)(w)?")?;
+fn parse(text: &str) -> Result<(bool, i32, bool)> {
+  let re = Regex::new(r"([ad]?)(\d+)(w?)")?;
+  let cap = re.captures(text).with_context(|| "not match")?;
+  let is_attack = &cap[1] != "d";
+  let num = cap[2].parse::<i32>()?;
+  let is_weak = !cap[3].is_empty();
+
+  Ok((is_attack, num, is_weak))
+}
+
+fn calculate_damage_internal(param: &Param) -> Result<Response> {
+  Ok(Response {
+    enemy_damage: Damage { min: 0, max: 0 },
+    player_damage: Damage { min: 0, max: 0 },
+  })
 }
 
 #[tauri::command]
@@ -64,7 +78,7 @@ fn calculate_damage(param: Param) /*-> Response*/
 {
   println!("param: {:?}", param);
 
-  let response = calcurate_damage_internal(&param);
+  let response = calculate_damage_internal(&param);
 
   let re = Regex::new(r"(a|d)?(\d+)(w)?").unwrap();
 
@@ -86,4 +100,21 @@ fn main() {
     .invoke_handler(tauri::generate_handler![calculate_damage])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_parse() {
+    let res = parse("100");
+    assert_eq!(res.unwrap(), (true, 100, false));
+
+    let res = parse("a1");
+    assert_eq!(res.unwrap(), (true, 1, false));
+
+    let res = parse("d33w");
+    assert_eq!(res.unwrap(), (false, 33, true));
+  }
 }

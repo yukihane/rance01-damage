@@ -46,6 +46,7 @@ struct Param {
 #[serde(rename_all = "camelCase")]
 struct Damage {
   min: i32,
+  normal: i32,
   max: i32,
 }
 
@@ -101,6 +102,7 @@ fn calculate_player_chips(chips: &Vec<String>) -> Option<(i32, i32)> {
 
 fn calculate_damage_internal(param: &Param) -> Result<Response> {
   let player_chips_total = calculate_player_chips(&param.player.chips).unwrap_or((0, 0));
+
   let player_attack_min = (player_chips_total.0 as f64 * 0.95) as i32;
 
   // 一発屋が有るなら x2.4, 無いなら 1.6
@@ -114,18 +116,92 @@ fn calculate_damage_internal(param: &Param) -> Result<Response> {
   let player_defense_max = (player_chips_total.1 as f64 * 1.05) as i32;
 
   let mut enemy_strongness = HashMap::new();
-  enemy_strongness.insert("D".to_string(), Damage { min: 0, max: 39 });
-  enemy_strongness.insert("D+".to_string(), Damage { min: 40, max: 79 });
-  enemy_strongness.insert("C".to_string(), Damage { min: 80, max: 119 });
-  enemy_strongness.insert("C+".to_string(), Damage { min: 120, max: 189 });
-  enemy_strongness.insert("B".to_string(), Damage { min: 190, max: 249 });
-  enemy_strongness.insert("B+".to_string(), Damage { min: 250, max: 339 });
-  enemy_strongness.insert("A".to_string(), Damage { min: 340, max: 409 });
-  enemy_strongness.insert("A+".to_string(), Damage { min: 410, max: 539 });
-  enemy_strongness.insert("S".to_string(), Damage { min: 540, max: 639 });
-  enemy_strongness.insert("S+".to_string(), Damage { min: 640, max: 789 });
+  enemy_strongness.insert(
+    "D".to_string(),
+    Damage {
+      min: 0,
+      normal: 20,
+      max: 39,
+    },
+  );
+  enemy_strongness.insert(
+    "D+".to_string(),
+    Damage {
+      min: 40,
+      normal: 60,
+      max: 79,
+    },
+  );
+  enemy_strongness.insert(
+    "C".to_string(),
+    Damage {
+      min: 80,
+      normal: 100,
+      max: 119,
+    },
+  );
+  enemy_strongness.insert(
+    "C+".to_string(),
+    Damage {
+      min: 120,
+      normal: 155,
+      max: 189,
+    },
+  );
+  enemy_strongness.insert(
+    "B".to_string(),
+    Damage {
+      min: 190,
+      normal: 220,
+      max: 249,
+    },
+  );
+  enemy_strongness.insert(
+    "B+".to_string(),
+    Damage {
+      min: 250,
+      normal: 295,
+      max: 339,
+    },
+  );
+  enemy_strongness.insert(
+    "A".to_string(),
+    Damage {
+      min: 340,
+      normal: 375,
+      max: 409,
+    },
+  );
+  enemy_strongness.insert(
+    "A+".to_string(),
+    Damage {
+      min: 410,
+      normal: 475,
+      max: 539,
+    },
+  );
+  enemy_strongness.insert(
+    "S".to_string(),
+    Damage {
+      min: 540,
+      normal: 590,
+      max: 639,
+    },
+  );
+  enemy_strongness.insert(
+    "S+".to_string(),
+    Damage {
+      min: 640,
+      normal: 715,
+      max: 789,
+    },
+  );
 
-  let damage0 = Damage { min: 0, max: 0 };
+  let damage0 = Damage {
+    min: 0,
+    normal: 0,
+    max: 0,
+  };
 
   let enemy_attack = enemy_strongness
     .get(&param.enemy.attack)
@@ -138,10 +214,12 @@ fn calculate_damage_internal(param: &Param) -> Result<Response> {
   Ok(Response {
     enemy_damage: Damage {
       min: max(player_attack_min - enemy_defense.max, 0),
+      normal: player_chips_total.0,
       max: max(player_attack_max - enemy_defense.min, 0),
     },
     player_damage: Damage {
       min: max(enemy_attack.min - player_defense_max, 0),
+      normal: player_chips_total.1,
       max: max(enemy_attack.max - player_defense_min, 0),
     },
   })
@@ -158,8 +236,16 @@ fn calculate_damage(param: Param) -> Response {
     Err(e) => {
       println!("{:?}", e);
       Response {
-        player_damage: Damage { min: 0, max: 0 },
-        enemy_damage: Damage { min: 0, max: 0 },
+        player_damage: Damage {
+          min: 0,
+          normal: 0,
+          max: 0,
+        },
+        enemy_damage: Damage {
+          min: 0,
+          normal: 0,
+          max: 0,
+        },
       }
     }
   }

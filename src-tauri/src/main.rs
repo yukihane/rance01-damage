@@ -125,13 +125,15 @@ fn calculate_damage_internal(param: &Param) -> Result<Response> {
   enemy_strongness.insert("S".to_string(), Damage { min: 540, max: 639 });
   enemy_strongness.insert("S+".to_string(), Damage { min: 640, max: 789 });
 
+  let damage0 = Damage { min: 0, max: 0 };
+
   let enemy_attack = enemy_strongness
     .get(&param.enemy.attack)
-    .with_context(|| "illegal enemy attack value")?;
+    .unwrap_or(&damage0);
 
   let enemy_defense = enemy_strongness
     .get(&param.enemy.defense)
-    .with_context(|| "illegal enemy defense value")?;
+    .unwrap_or(&damage0);
 
   Ok(Response {
     enemy_damage: Damage {

@@ -214,12 +214,12 @@ fn calculate_damage_internal(param: &Param) -> Result<Response> {
   Ok(Response {
     enemy_damage: Damage {
       min: max(player_attack_min - enemy_defense.max, 0),
-      normal: player_chips_total.0,
+      normal: max(player_chips_total.0 - enemy_defense.normal, 0),
       max: max(player_attack_max - enemy_defense.min, 0),
     },
     player_damage: Damage {
       min: max(enemy_attack.min - player_defense_max, 0),
-      normal: player_chips_total.1,
+      normal: max(enemy_attack.normal - player_chips_total.1, 0),
       max: max(enemy_attack.max - player_defense_min, 0),
     },
   })

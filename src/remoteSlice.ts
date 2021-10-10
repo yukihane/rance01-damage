@@ -55,7 +55,10 @@ interface RemoteState {
 }
 
 const initialState: RemoteState = {
-  result: { playerDamage: { min: 0, max: 0 }, enemyDamage: { min: 0, max: 0 } },
+  result: {
+    playerDamage: { min: 0, normal: 0, max: 0 },
+    enemyDamage: { min: 0, normal: 0, max: 0 },
+  },
 };
 
 const remoteSlice = createSlice({

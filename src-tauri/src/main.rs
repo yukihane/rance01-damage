@@ -1,12 +1,17 @@
+// http://alice.xfu.jp/doku.php?id=%E3%83%A9%E3%83%B3%E3%82%B901:%E6%88%A6%E9%97%98
+// を参考に計算処理を行う
+
 #![cfg_attr(
   all(not(debug_assertions), target_os = "windows"),
   windows_subsystem = "windows"
 )]
 
-use anyhow::{Context as _, Result};
+use std::collections::HashMap;
+
+use anyhow::{Context, Result};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::error::Error;
+use std::cmp::max;
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -56,43 +61,110 @@ struct Total {
   defense: i32,
 }
 
-fn parse(text: &str) -> Result<(bool, i32, bool)> {
+struct PlayerChip {
+  /// 攻撃値なら true, 防御値なら false
+  is_attack: bool,
+  /// 値
+  value: i32,
+  /// 弱点属性なら true (本来なら攻撃に対してのみ付与される属性だがチェックしていない)
+  is_weak: bool,
+}
+
+/// player のチップ情報をパースします。
+fn parse_player_chip_text(text: &str) -> Result<PlayerChip> {
   let re = Regex::new(r"([ad]?)(\d+)(w?)")?;
   let cap = re.captures(text).with_context(|| "not match")?;
   let is_attack = &cap[1] != "d";
-  let num = cap[2].parse::<i32>()?;
+  let value = cap[2].parse::<i32>()?;
   let is_weak = !cap[3].is_empty();
 
-  Ok((is_attack, num, is_weak))
+  Ok(PlayerChip {
+    is_attack,
+    value,
+    is_weak,
+  })
+}
+
+fn calculate_player_chips(chips: &Vec<String>) -> Option<(i32, i32)> {
+  chips
+    .iter()
+    .map(|chip| parse_player_chip_text(chip))
+    .map(|r| {
+      r.and_then(|c| {
+        let value = if c.is_weak { c.value * 3 } else { c.value };
+        if c.is_attack {
+          Ok((value, 0))
+        } else {
+          Ok((0, value))
+        }
+      })
+    })
+    .filter_map(Result::ok)
+    .reduce(|x, y| (x.0 + y.0, x.1 + y.1))
 }
 
 fn calculate_damage_internal(param: &Param) -> Result<Response> {
+  let player_chips_total = calculate_player_chips(&param.player.chips).unwrap_or((0, 0));
+  let player_attack_min = (player_chips_total.0 as f64 * 0.95) as i32;
+
+  // 一発屋が有るなら x2.4, 無いなら 1.6
+  let critical = if param.player.one_shot { 2.4 } else { 1.6 };
+  let player_attack_max = (player_chips_total.0 as f64 * 1.05 * critical) as i32;
+
+  // 敵のハニーフラッシュ属性攻撃は防御値 x0.05
+  let honey_flash = if param.enemy.honey_flash { 0.05 } else { 1.0 };
+  let player_defense_min = (player_chips_total.1 as f64 * 0.95 * honey_flash) as i32;
+
+  let player_defense_max = (player_chips_total.1 as f64 * 1.05) as i32;
+
+  let mut enemy_strongness = HashMap::new();
+  enemy_strongness.insert("D".to_string(), Damage { min: 0, max: 39 });
+  enemy_strongness.insert("D+".to_string(), Damage { min: 40, max: 79 });
+  enemy_strongness.insert("C".to_string(), Damage { min: 80, max: 119 });
+  enemy_strongness.insert("C+".to_string(), Damage { min: 120, max: 189 });
+  enemy_strongness.insert("B".to_string(), Damage { min: 190, max: 249 });
+  enemy_strongness.insert("B+".to_string(), Damage { min: 250, max: 339 });
+  enemy_strongness.insert("A".to_string(), Damage { min: 340, max: 409 });
+  enemy_strongness.insert("A+".to_string(), Damage { min: 410, max: 539 });
+  enemy_strongness.insert("S".to_string(), Damage { min: 540, max: 639 });
+  enemy_strongness.insert("S+".to_string(), Damage { min: 640, max: 789 });
+
+  let enemy_attack = enemy_strongness
+    .get(&param.enemy.attack)
+    .with_context(|| "illegal enemy attack value")?;
+
+  let enemy_defense = enemy_strongness
+    .get(&param.enemy.defense)
+    .with_context(|| "illegal enemy defense value")?;
+
   Ok(Response {
-    enemy_damage: Damage { min: 0, max: 0 },
-    player_damage: Damage { min: 0, max: 0 },
+    enemy_damage: Damage {
+      min: max(player_attack_min - enemy_defense.max, 0),
+      max: max(player_attack_max - enemy_defense.min, 0),
+    },
+    player_damage: Damage {
+      min: max(enemy_attack.min - player_defense_max, 0),
+      max: max(enemy_attack.max - player_defense_min, 0),
+    },
   })
 }
 
 #[tauri::command]
-fn calculate_damage(param: Param) /*-> Response*/
-{
+fn calculate_damage(param: Param) -> Response {
   println!("param: {:?}", param);
 
   let response = calculate_damage_internal(&param);
 
-  let re = Regex::new(r"(a|d)?(\d+)(w)?").unwrap();
-
-  // const res = RE.is_match("a10w");
-
-  // let iter = param.player.chips.iter().map(|x| {
-  //   if x.contains("d") {
-  //   } else {
-  //   }
-  // });
-  // Response {
-  //   player_damage: Damage { min: 10, max: 20 },
-  //   enemy_damage: Damage { min: 30, max: 40 },
-  // }
+  match response {
+    Ok(res) => res,
+    Err(e) => {
+      println!("{:?}", e);
+      Response {
+        player_damage: Damage { min: 0, max: 0 },
+        enemy_damage: Damage { min: 0, max: 0 },
+      }
+    }
+  }
 }
 
 fn main() {
@@ -108,13 +180,13 @@ mod tests {
 
   #[test]
   fn test_parse() {
-    let res = parse("100");
+    let res = parse_player_chip_text("100");
     assert_eq!(res.unwrap(), (true, 100, false));
 
-    let res = parse("a1");
+    let res = parse_player_chip_text("a1");
     assert_eq!(res.unwrap(), (true, 1, false));
 
-    let res = parse("d33w");
+    let res = parse_player_chip_text("d33w");
     assert_eq!(res.unwrap(), (false, 33, true));
   }
 }

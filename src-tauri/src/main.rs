@@ -56,11 +56,7 @@ struct Response {
   enemy_damage: Damage,
 }
 
-struct Total {
-  attack: i32,
-  defense: i32,
-}
-
+#[derive(Debug, PartialEq)]
 struct PlayerChip {
   /// 攻撃値なら true, 防御値なら false
   is_attack: bool,
@@ -181,12 +177,33 @@ mod tests {
   #[test]
   fn test_parse() {
     let res = parse_player_chip_text("100");
-    assert_eq!(res.unwrap(), (true, 100, false));
+    assert_eq!(
+      res.unwrap(),
+      PlayerChip {
+        is_attack: true,
+        value: 100,
+        is_weak: false
+      }
+    );
 
     let res = parse_player_chip_text("a1");
-    assert_eq!(res.unwrap(), (true, 1, false));
+    assert_eq!(
+      res.unwrap(),
+      PlayerChip {
+        is_attack: true,
+        value: 1,
+        is_weak: false
+      }
+    );
 
     let res = parse_player_chip_text("d33w");
-    assert_eq!(res.unwrap(), (false, 33, true));
+    assert_eq!(
+      res.unwrap(),
+      PlayerChip {
+        is_attack: false,
+        value: 33,
+        is_weak: true
+      }
+    );
   }
 }

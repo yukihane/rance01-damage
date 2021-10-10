@@ -20,10 +20,12 @@ export const ResultPane: FC<Props> = ({ title, value }) => {
         <table>
           <tr>
             <th>最小</th>
+            <th>標準</th>
             <th>最大</th>
           </tr>
           <tr>
             <td>{value.min}</td>
+            <td>{value.normal}</td>
             <td>{value.max}</td>
           </tr>
         </table>

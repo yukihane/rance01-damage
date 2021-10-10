@@ -1,0 +1,46 @@
+= ランス01 光をもとめて ダメージ計算
+
+== これは何？
+
+Rust 習作として作成したGUIアプリケーションです。
+
+https://www.alicesoft.com/rance01/[ランス01 光をもとめて]の戦闘時攻撃ダメージ計算を行います。
+
+なお、計算式は http://alice.xfu.jp/doku.php?id=%E3%83%A9%E3%83%B3%E3%82%B901:%E6%88%A6%E9%97%98[アリスまとめ > ランス01:戦闘] ページにすべて頼っています。
+
+== ビルド/実行 方法
+
+https://tauri.studio/en/docs/getting-started/intro/[Tauri のビルド方法] に準じます。
+
+== 利用方法
+
+入力欄に次の情報を入力することで被ダメージ, 与ダメージを計算し出力します。
+
+[cols="1,4"]
+|===
+|項目名 |説明
+
+|ターン
+| ターン数ですが、現在計算に利用していません。
+
+|プレーヤーチップ
+| `100` なら攻撃力 `100` を、 `d50` なら防御力 `50` を表します。弱点属性なら末尾に `w` を付与して `100w` のように入力します。
+
+|一発屋
+|一発屋を備えているならチェック。
+
+|敵攻撃力, 敵防御力
+| `D` や `A+` と言った値を入力します。
+
+|ハニーフラッシュ
+|ハニーフラッシュ付与ならチェック。
+
+|===
+
+== 技術スタック 
+
+* https://www.rust-lang.org/ja/[Rust]
+* https://tauri.studio/[Tauri]
+* https://ja.reactjs.org/[React]
+* https://www.typescriptlang.org/ja/[TypeScript]
+* https://redux-toolkit.js.org/[Redux Toolkit]

@@ -22,10 +22,10 @@ export const App = () => {
         <EnemyPane />
       </div>
       <div id="playerDamagePane">
-        <ResultPane title="プレーヤー" value={playerDamage} />
+        <ResultPane title="プレーヤー(被ダメージ)" value={playerDamage} />
       </div>
       <div id="enemyDamagePane">
-        <ResultPane title="敵" value={enemyDamage} />
+        <ResultPane title="敵(与ダメージ)" value={enemyDamage} />
       </div>
     </div>
   );
